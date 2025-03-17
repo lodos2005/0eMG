@@ -42,7 +42,7 @@ jobs:
       run: go build -o oemg ./...
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-pages-artifact@v3
       with:
         name: oemg-${{ matrix.os }}
         path: oemg

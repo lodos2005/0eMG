@@ -1,17 +1,4 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# This workflow lets you compile your Go project using a SLSA3 compliant builder.
-# This workflow will generate a so-called "provenance" file describing the steps
-# that were performed to generate the final binary.
-# The project is an initiative of the OpenSSF (openssf.org) and is developed at
-# https://github.com/slsa-framework/slsa-github-generator.
-# The provenance file can be verified using https://github.com/slsa-framework/slsa-verifier.
-# For more information about SLSA and how it improves the supply-chain, visit slsa.dev.
-
-name: SLSA Go releaser
+name: Go Releaser
 on:
   workflow_dispatch:
   release:
@@ -30,92 +17,41 @@ jobs:
         go-version: [1.18] # Go versiyonunu belirt
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ matrix.go-version }}
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go-version }}
 
-    - name: Build
-      run: go build -o oemg ./...
+      - name: Build
+        run: go build -o oemg-${{ matrix.os }} ./...
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: oemg-${{ matrix.os }}
-        path: oemg
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oemg-${{ matrix.os }}
+          path: oemg-${{ matrix.os }}
 
-  slsa-release:
+  release:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      id-token: write # SLSA için gerekli izin
-
     steps:
-    - name: Download Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: artifacts
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Generate SLSA Provenance
-      uses: slsa-framework/slsa-github-generator/.github/actions/generator@v1
-      with:
-        base64-subjects: true
-        subjects: |
-          ./artifacts/oemg-ubuntu-latest
-          ./artifacts/oemg-windows-latest
-          ./artifacts/oemg-macos-latest
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
+      - name: List artifacts
+        run: ls -R artifacts
 
-    - name: Upload Release Assets
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/oemg-ubuntu-latest
-        asset_name: oemg-ubuntu-latest
-        asset_content_type: application/octet-stream
-
-    - name: Upload Release Assets
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/oemg-windows-latest
-        asset_name: oemg-windows-latest.exe
-        asset_content_type: application/octet-stream
-
-    - name: Upload Release Assets
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/oemg-macos-latest
-        asset_name: oemg-macos-latest
-        asset_content_type: application/octet-stream
-
-    - name: Upload SLSA Provenance
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/slsa-provenance.json
-        asset_name: slsa-provenance.json
-        asset_content_type: application/json
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

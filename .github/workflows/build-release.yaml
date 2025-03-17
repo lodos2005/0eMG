@@ -31,7 +31,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Go
       uses: actions/setup-go@v4
@@ -39,13 +39,13 @@ jobs:
         go-version: ${{ matrix.go-version }}
 
     - name: Build
-      run: go build -o myapp ./...
+      run: go build -o oemg ./...
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: myapp-${{ matrix.os }}
-        path: myapp
+        name: oemg-${{ matrix.os }}
+        path: oemg
 
   slsa-release:
     needs: build
@@ -56,7 +56,7 @@ jobs:
 
     steps:
     - name: Download Artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v3
       with:
         path: artifacts
 
@@ -65,9 +65,9 @@ jobs:
       with:
         base64-subjects: true
         subjects: |
-          ./artifacts/myapp-ubuntu-latest
-          ./artifacts/myapp-windows-latest
-          ./artifacts/myapp-macos-latest
+          ./artifacts/oemg-ubuntu-latest
+          ./artifacts/oemg-windows-latest
+          ./artifacts/oemg-macos-latest
 
     - name: Create Release
       id: create_release
@@ -86,8 +86,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/myapp-ubuntu-latest
-        asset_name: myapp-ubuntu-latest
+        asset_path: ./artifacts/oemg-ubuntu-latest
+        asset_name: oemg-ubuntu-latest
         asset_content_type: application/octet-stream
 
     - name: Upload Release Assets
@@ -96,8 +96,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/myapp-windows-latest
-        asset_name: myapp-windows-latest.exe
+        asset_path: ./artifacts/oemg-windows-latest
+        asset_name: oemg-windows-latest.exe
         asset_content_type: application/octet-stream
 
     - name: Upload Release Assets
@@ -106,8 +106,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/myapp-macos-latest
-        asset_name: myapp-macos-latest
+        asset_path: ./artifacts/oemg-macos-latest
+        asset_name: oemg-macos-latest
         asset_content_type: application/octet-stream
 
     - name: Upload SLSA Provenance

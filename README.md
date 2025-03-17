@@ -38,7 +38,7 @@ This means two completely different strings that produce hash values starting wi
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/0emg.git
+git clone https://github.com/lodos2005/0emg.git
 cd 0emg
 go build
 ```
@@ -48,19 +48,19 @@ go build
 Basic usage:
 
 ```bash
-./main run
+./oemg run
 ```
 
 With custom options:
 
 ```bash
-./main -hash sha1 -mode prefix -base test123 -min 3 -max 10 run
+./oemg -hash md5 -mode prefix -base test123 -min 3 -max 10 run
 ```
 
 Check a specific string:
 
 ```bash
-./main -hash md5 check
+./oemg -hash md5 check
 ```
 
 ### Supported Hash Types
@@ -132,7 +132,7 @@ Bu, "0e" ile başlayıp sonrasında sadece rakamlar içeren hash değerleri üre
 ### Kurulum
 
 ```bash
-git clone https://github.com/kullaniciadi/0emg.git
+git clone https://github.com/lodos2005/0emg.git
 cd 0emg
 go build
 ```
@@ -142,19 +142,19 @@ go build
 Temel kullanım:
 
 ```bash
-./main run
+./oemg run
 ```
 
 Özel seçeneklerle:
 
 ```bash
-./main -hash sha1 -mode prefix -base test123 -min 3 -max 10 run
+./oemg -hash md5 -mode prefix -base test123 -min 3 -max 10 run
 ```
 
 Belirli bir string'i kontrol etme:
 
 ```bash
-./main -hash md5 check
+./oemg -hash md5 check
 ```
 
 ### Desteklenen Hash Tipleri
